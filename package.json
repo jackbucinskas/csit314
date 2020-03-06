@@ -1,0 +1,20 @@
+{
+  "name": "csit314",
+  "version": "1.0.0",
+  "description": "Conference Management System",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackbucinskas/csit314.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackbucinskas/csit314/issues"
+  },
+  "homepage": "https://github.com/jackbucinskas/csit314#readme"
+}
