@@ -1,2 +1,2 @@
-# csit314
-Group Project
+# CSIT314
+Software Development Methodologies - Group Project
