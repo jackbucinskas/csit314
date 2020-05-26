@@ -11,10 +11,16 @@
     "type": "git",
     "url": "git+https://github.com/jackbucinskas/csit314.git"
   },
-  "author": "",
+  "author": "Jack Bucinskas",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jackbucinskas/csit314/issues"
   },
-  "homepage": "https://github.com/jackbucinskas/csit314#readme"
+  "homepage": "https://github.com/jackbucinskas/csit314#readme",
+  "dependencies": {
+    "chance": "^1.1.6",
+    "mocha": "^7.2.0",
+    "mongodb": "^3.5.7"
+  },
+  "devDependencies": {}
 }
