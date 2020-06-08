@@ -11,4 +11,5 @@ Developing a Software Testing Tool with [Node.js](https://nodejs.org/en/), [Chan
 
 ### Requirements
 Flickr API Key: https://www.flickr.com/services/api/keys/apply/
+
 MongoDB Client: https://docs.mongodb.com/manual/installation/
