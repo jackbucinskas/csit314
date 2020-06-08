@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jackbucinskas/csit314#readme",
   "dependencies": {
+    "assert": "^2.0.0",
     "chance": "^1.1.6",
     "dotenv": "^8.2.0",
     "flickr-sdk": "^3.9.0",

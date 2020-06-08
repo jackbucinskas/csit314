@@ -13,8 +13,11 @@ require('dotenv').config();
 var chance = require('chance').Chance();
 
 // Import MongoDB for logging results
-var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/csit314_db";
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+const url = "mongodb://localhost:27017/";
+const dbName = 'csit314';
+const client = new MongoClient(url, {useNewUrlParser: true});
 
 // Import Flickr API to conduct Tests
 /*
@@ -25,16 +28,41 @@ var Flickr = require('flickr-sdk');
 var flickr = new Flickr(process.env.FLICKR_API_KEY);
 
 // Connect to MongoDB
-MongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true})
-    .then(() => console.log("Connected to Database"))
-    .catch(err => console.error("An error has occured", err));
+client.connect(function(err) {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+
+    const db = client.db(dbName);
+
+    // After insert documents, close connection
+    insertDocuments(db, function() {
+        client.close();
+    });
+});
+
+const insertDocuments = function(db, callback) {
+    // Get the documents collection
+    const collection = db.collection('reports');
+    // Insert some documents
+    collection.insertMany([
+        {a : 1}, {a : 2}, {a : 3}
+    ], function(err, result) {
+        assert.equal(err, null);
+        assert.equal(3, result.result.n);
+        assert.equal(3, result.ops.length);
+        console.log("Inserted 3 documents into the collection");
+        callback(result);
+    });
+}
 
 // Flickr API
-flickr.photos.getInfo({
-    photo_id: 25825763 // sorry, @dokas
-}).then(function (res) {
-    console.log('yay!', res.body);
-}).catch(function (err) {
-    console.error('bonk', err);
-});
+// flickr.photos.getInfo({
+//     photo_id: 25825763 // sorry, @dokas
+// }).then(function (res) {
+//     console.log('yay!', res.body);
+// }).catch(function (err) {
+//     console.error('bonk', err);
+// });
+
+
 
