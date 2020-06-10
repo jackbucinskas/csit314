@@ -36,7 +36,7 @@ client.connect(function(err) {
 
     const db = client.db(dbName);
 
-    db.createCollection("results", function(err, res) {
+    db.createCollection("query_results", function(err, res) {
         if (err) throw err;
         console.log("Collection created!");
     });
@@ -62,7 +62,7 @@ client.connect(function(err) {
             console.log('Successful API Call 1.1', res.body);
             console.log('Saving to ' + url + dbName + '\n');
             totals.push(res.body.photos.total); //add total number of results to array
-            db.collection("results").insertOne(res.body);
+            db.collection("query_results").insertOne(res.body);
         }).catch(function (err) {
             console.error('Something Went Wrong', err);
         });
@@ -78,7 +78,7 @@ client.connect(function(err) {
             console.log('Successful API Call 1.2', res.body);
             console.log('Saving to ' + url + dbName + '\n');
             totals.push(res.body.photos.total);
-            db.collection("results").insertOne(res.body);
+            db.collection("query_results").insertOne(res.body);
         }).catch(function (err) {
             console.error('Something Went Wrong', err);
         });
@@ -94,15 +94,52 @@ client.connect(function(err) {
             console.log('Successful API Call 1.3', res.body);
             console.log('Saving to ' + url + dbName + '\n');
             totals.push(res.body.photos.total);
-            db.collection("results").insertOne(res.body);
+            db.collection("query_results").insertOne(res.body);
         }).catch(function (err) {
             console.error('Something Went Wrong', err);
         });
     }
 
+
+    //Queries - Section 2
+    var random_id = chance.integer({ min: 0, max: 100});
+    //Query 2.1
+    var posted_date, taken_date
+
+    function query2_1() {
+      flickr.photos.getRecent({
+        per_page: 100,
+        page: 1
+      }).then(function (res) {
+        console.log("Successful API Call 2.1", res.body);
+        var photo_id = res.body.photos.photo[random_id].id;
+        //console.log("photo id:", random_id);
+        
+        flickr.photos.getInfo({
+          photo_id: photo_id
+        }).then(function (res) {
+          //console.log('Successful getInfo()', res.body);
+          posted_date = res.body.photo.dates.posted;
+          var myDate = new Date(res.body.photo.dates.taken); // Your timezone!
+          taken_date = myDate.getTime()/1000.0;
+          //console.log("Epoch date:", taken_date);
+          console.log('Saving to ' + url + dbName + '\n');
+          db.collection("query_results").insertOne(res.body);
+        }).catch(function (err) {
+          console.error('Something Went Wrong', err);
+        });
+        
+      }).catch(function (err) {
+        console.error('Something Went Wrong', err);
+      });
+    }
+
+    //Test function
     function testQueries1(totalsArray) {
       var pass; 
       console.log("--- Test ---");
+
+      console.log("-Section 1 Queries-\n");
       console.log("Is (Query 1 total < Query 2 total < Query 3 total) true?")
       console.log("Query 1 total =", totalsArray[0]);
       console.log("Query 2 total =", totalsArray[1]);
@@ -117,6 +154,16 @@ client.connect(function(err) {
 
       console.log("Section 1 pass:", pass);
 
+
+      console.log("\n\n-Section 2 Queries-\n");
+      console.log("Is date posted later than date taken?")
+
+      var postedDate = new Date( posted_date *1000);
+      var takenDate = new Date( taken_date *1000);
+
+      console.log("Date posted:", postedDate.toGMTString());
+      console.log("Date taken:", takenDate.toGMTString());
+
       if (posted_date > taken_date){
         pass = true;
       } else {
@@ -128,45 +175,12 @@ client.connect(function(err) {
       process.exit();
     }
 
-
-    //Queries - Section 2
-
-    //Query 2.1
-    var posted_date, taken_date
-
-    function query2_1() {
-      flickr.photos.getRecent({
-        per_page: 1,
-        page: 1,
-        pages: 1
-      }).then(function (res) {
-        console.log("Successful API Call 2.1", res.body);
-        var photo_id = res.body.photos.photo[0].id;
-        console.log("photo id:", photo_id);
-        
-        flickr.photos.getInfo({
-          photo_id: photo_id
-        }).then(function (res) {
-          console.log('Successful getInfo()', res.body);
-          posted_date = res.body.photo.dates.posted;
-          var myDate = new Date(res.body.photo.dates.taken); // Your timezone!
-          taken_date = myDate.getTime()/1000.0;
-          console.log("Epoch date:", taken_date);
-        }).catch(function (err) {
-          console.error('Something Went Wrong', err);
-        });
-        
-      }).catch(function (err) {
-        console.error('Something Went Wrong', err);
-      });
-  }
-
     // Conduct Flickr Search API Call
     query1();
     setTimeout(query2, 1000);
     setTimeout(query3, 2000);
 
-    query2_1();
+    setTimeout(query2_1, 3000);
 
     //Run test
     setTimeout(testQueries1, 5000, totals);
