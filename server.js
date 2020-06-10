@@ -49,13 +49,13 @@ client.connect(function(err) {
     // Randomize search text and print "Searching for: Random Animal"
     var animal_tag = chance.animal().toString();
     console.log("Searching for: " + animal_tag);
-
     var totals = [];
 
     // Query 1.1
     function query1() {
         flickr.photos.search({
             text: animal_tag,
+            tags: 'technology',
             min_upload_date: '2020-01-01', // YYYY-MM-DD
             max_upload_date: '2020-02-01'
         }).then(function (res) {
@@ -67,6 +67,8 @@ client.connect(function(err) {
             console.error('Something Went Wrong', err);
         });
     }
+
+    tags: 'technology'
 
     // Query 1.2
     function query2() {
@@ -107,24 +109,21 @@ client.connect(function(err) {
     var posted_date, taken_date
 
     function query2_1() {
-      flickr.photos.getRecent({
-        per_page: 100,
-        page: 1
+      flickr.photos.getRecent({ //get most recent public posts
+        per_page: 100, //limit to 100 results per page
+        page: 1 //search on page 1
       }).then(function (res) {
         console.log("Successful API Call 2.1", res.body);
-        var photo_id = res.body.photos.photo[random_id].id;
-        //console.log("photo id:", random_id);
+        var photo_id = res.body.photos.photo[random_id].id; //use random integer initilised above for id index
         
-        flickr.photos.getInfo({
+        flickr.photos.getInfo({ //get info on particular post
           photo_id: photo_id
         }).then(function (res) {
-          //console.log('Successful getInfo()', res.body);
           posted_date = res.body.photo.dates.posted;
-          var myDate = new Date(res.body.photo.dates.taken); // Your timezone!
-          taken_date = myDate.getTime()/1000.0;
-          //console.log("Epoch date:", taken_date);
+          var myDate = new Date(res.body.photo.dates.taken);
+          taken_date = myDate.getTime()/1000.0; //convert date
           console.log('Saving to ' + url + dbName + '\n');
-          db.collection("query_results").insertOne(res.body);
+          db.collection("query_results").insertOne(res.body); //save results to database
         }).catch(function (err) {
           console.error('Something Went Wrong', err);
         });
@@ -137,9 +136,10 @@ client.connect(function(err) {
     //Test function
     function testQueries1(totalsArray) {
       var pass; 
-      console.log("--- Test ---");
+      console.log("--- Tests ---\n");
 
-      console.log("-Section 1 Queries-\n");
+      console.log("-Section 1 Queries-");
+      console.log("-Test 1-");
       console.log("Is (Query 1 total < Query 2 total < Query 3 total) true?")
       console.log("Query 1 total =", totalsArray[0]);
       console.log("Query 2 total =", totalsArray[1]);
@@ -152,10 +152,26 @@ client.connect(function(err) {
         pass = false;
       };
 
-      console.log("Section 1 pass:", pass);
+      console.log("Section 1 - Test 1 pass:", pass);
 
 
-      console.log("\n\n-Section 2 Queries-\n");
+      console.log("\n\n-Test 2-");
+      console.log("Is (Query 1 total < Query 3 total) true?")
+      console.log("Query 1 total =", totalsArray[0]);
+      console.log("Query 3 total =", totalsArray[2]);
+
+      if (totalsArray[0] < totalsArray[2]){
+        pass = true;
+      }
+      else{
+        pass = false;
+      };
+
+      console.log("Section 1 - Test 2 pass:", pass);
+
+
+      console.log("\n\n-Section 2 Queries-");
+      console.log("-Test 1-");
       console.log("Is date posted later than date taken?")
 
       var postedDate = new Date( posted_date *1000);
