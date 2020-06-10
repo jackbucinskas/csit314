@@ -17,7 +17,8 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const url = "mongodb://localhost:27017/";
 const dbName = 'csit314';
-const client = new MongoClient(url, {useNewUrlParser: true});
+//const client = new MongoClient(url, {useNewUrlParser: true});
+const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Import Flickr API to conduct Tests
 /*
@@ -54,7 +55,7 @@ const insertDocuments = function(db, callback) {
         callback(result);
     });
 }
-
+/*
  //Flickr API
  flickr.photos.getInfo({
      photo_id: 25825763 // sorry, @dokas
@@ -63,6 +64,52 @@ const insertDocuments = function(db, callback) {
  }).catch(function (err) {
      console.error('bonk', err);
  });
+*/
+
+ //flickr.stats.getTotalViews({})
+/*
+ var flickr = new Flickr(Flickr.OAuth.createPlugin(
+    process.env.FLICKR_CONSUMER_KEY,
+    process.env.FLICKR_CONSUMER_SECRET,
+    process.env.FLICKR_OAUTH_TOKEN,
+    process.env.FLICKR_OAUTH_TOKEN_SECRET
+  ));
+*/  
+
+var oauth = new Flickr.OAuth(
+  process.env.FLICKR_CONSUMER_KEY, //add to .env
+  process.env.FLICKR_CONSUMER_SECRET
+);
+
+oauth.request('http://localhost:27017/oauth/callback').then(function (res) {
+  console.log('yay!', res);
+}).catch(function (err) {
+  console.error('bonk', err);
+});
 
 
+
+/*
+var url2 = oauth.authorizeUrl(requestToken); // "https://www.flickr.com/services/oauth..."
+ 
+res.setHeader("Location", url2);
+res.statusCode = 302;
+res.end();
+*/
+
+/*
+  flickr.test.login().then(function (res) {
+    console.log('yay!', res.body);
+  }).catch(function (err) {
+    console.error('bonk', err);
+  });
+*/
+/*
+  oauth.verify(oauthToken, oauthVerifier, tokenSecret).then(function (res) {
+    console.log('oauth token:', res.body.oauth_token);
+    console.log('oauth token secret:', res.body.oauth_token_secret);
+  }).catch(function (err) {
+   console.log('bonk', err);
+  });
+*/
 
