@@ -1,95 +1,34 @@
-/*
-    Jack Bucinskas
-    jb182@uowmail.edu.au
-    5814583
-
-    Group 2 - Project Part II
- */
-
-// Allow .env files to work
-require('dotenv').config();
-
-// Import Chance Library for Random Test Generation
-var chance = require('chance').Chance();
-
-// Import MongoDB for logging results
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
-const url = "mongodb://localhost:27017/";
-const dbName = 'csit314';
-//const client = new MongoClient(url, {useNewUrlParser: true});
-const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
-
-// Import Flickr API to conduct Tests
-/*
-    IMPORTANT: Rename .env.example to .env and place your API Key inside OR
-    Replace 'process.env.FLICKR_API_KEY' with your API Key
- */
-var Flickr = require('flickr-sdk');
-var flickr = new Flickr(process.env.FLICKR_API_KEY);
-
-/*
-// Connect to MongoDB
-client.connect(function(err) {
-    assert.equal(null, err);
-    console.log("Connected successfully to server");
-
-    const db = client.db(dbName);
-
-    // After insert documents, close connection
-    insertDocuments(db, function() {
-        client.close();
-    });
-});
-
-const insertDocuments = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('reports');
-    // Insert some documents
-    collection.insertMany([
-        {a : 1}, {a : 2}, {a : 3}
-    ], function(err, result) {
-        assert.equal(err, null);
-        assert.equal(3, result.result.n);
-        assert.equal(3, result.ops.length);
-        console.log("Inserted 3 documents into the collection");
-        callback(result);
-    });
-}
-*/
-/*
- //Flickr API
- flickr.photos.getInfo({
-     photo_id: 25825763 // sorry, @dokas
- }).then(function (res) {
-     console.log('yay!', res.body);
- }).catch(function (err) {
-     console.error('bonk', err);
- });
-*/
-
- //flickr.stats.getTotalViews({})
-/*
- var flickr = new Flickr(Flickr.OAuth.createPlugin(
-    process.env.FLICKR_CONSUMER_KEY,
-    process.env.FLICKR_CONSUMER_SECRET,
-    process.env.FLICKR_OAUTH_TOKEN,
-    process.env.FLICKR_OAUTH_TOKEN_SECRET
-  ));
-*/  
-
+var Flickr = require('..');
 var http = require('http');
 var parse = require('url').parse;
+
+/**
+ * This example demonstrates the full OAuth flow described here:
+ * https://www.flickr.com/services/api/auth.oauth.html
+ */
+
+// first, sign up for an application to get a consumer key and secret.
+// users will authorize your app to make calls to the api on their behalf.
+// https://www.flickr.com/services/apps/create/apply/?
 
 var oauth = new Flickr.OAuth(
 	process.env.FLICKR_CONSUMER_KEY,
 	process.env.FLICKR_CONSUMER_SECRET
 );
 
+// your application will need some sort of database to store request
+// tokens and oauth tokens for the user. you should use an actual
+// database instead of in-memory maps.
+
 var db = {
 	users: new Map(),
 	oauth: new Map()
 };
+
+// obtain a request token from the Flickr API. the user will then be
+// redirected to flickr to authorize your application. if they do,
+// they will be redirected back to your application with a request
+// token verifier, which you will exchange for the real oauth token.
 
 function getRequestToken(req, res) {
 	oauth.request('http://localhost:3000/oauth/callback').then(function (_res) {
@@ -110,6 +49,12 @@ function getRequestToken(req, res) {
 		res.end(err.message);
 	});
 }
+
+// congratulations! the user has authorized your app. now you need to
+// verify and exchange the request token for the user's oauth token
+// and secret. at this point, we no longer need our request token
+// and secret so we can get rid of them, and we can store the user's
+// oauth token and secret in our database to make authenticated api calls.
 
 function verifyRequestToken(req, res, query) {
 	var requestToken = query.oauth_token;
@@ -152,6 +97,7 @@ function verifyRequestToken(req, res, query) {
 	});
 }
 
+// create a simple server to handle incoming requests.
 
 http.createServer(function (req, res) {
 	var url = parse(req.url, true);
@@ -168,5 +114,3 @@ http.createServer(function (req, res) {
 }).listen(3000, function () {
 	console.log('Open your browser to http://localhost:3000');
 });
-
-
