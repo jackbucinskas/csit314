@@ -28,67 +28,78 @@ var Flickr = require('flickr-sdk');
 var flickr = new Flickr(process.env.FLICKR_API_KEY);
 
 // Connect to MongoDB
-client.connect(function(err) {
-    assert.equal(null, err);
-    console.log("Connected successfully to server");
+// client.connect(function(err) {
+//     assert.equal(null, err);
+//     console.log("Connected successfully to server");
+//
+//     const db = client.db(dbName);
+//
+//     // After insert documents, close connection
+//     insertDocuments(db, function() {
+//         client.close();
+//     });
+// });
+//
+// const insertDocuments = function(db, callback) {
+//     // Get the documents collection
+//     const collection = db.collection('reports');
+//     // Insert some documents
+//     collection.insertMany([
+//         {a : 1}, {a : 2}, {a : 3}
+//     ], function(err, result) {
+//         assert.equal(err, null);
+//         assert.equal(3, result.result.n);
+//         assert.equal(3, result.ops.length);
+//         console.log("Inserted 3 documents into the collection");
+//         callback(result);
+//     });
+// }
 
-    const db = client.db(dbName);
+// Flickr Photo Search API Call
+// Randomize search text and print "Searching for: Random Animal"
+var animal_tag = chance.animal().toString();
+console.log("Searching for: " + animal_tag);
 
-    // After insert documents, close connection
-    insertDocuments(db, function() {
-        client.close();
-    });
-});
-
-const insertDocuments = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('reports');
-    // Insert some documents
-    collection.insertMany([
-        {a : 1}, {a : 2}, {a : 3}
-    ], function(err, result) {
-        assert.equal(err, null);
-        assert.equal(3, result.result.n);
-        assert.equal(3, result.ops.length);
-        console.log("Inserted 3 documents into the collection");
-        callback(result);
+// Query 1
+function query1() {
+    flickr.photos.search({
+        text: animal_tag,
+        min_upload_date: '2020-01-01', // YYYY-MM-DD
+        max_upload_date: '2020-02-01'
+    }).then(function (res) {
+        console.log('Successful API Call 1', res.body);
+    }).catch(function (err) {
+        console.error('Something Went Wrong', err);
     });
 }
 
-var animal_tag = chance.animal().toString()
-
-// Flickr Photo Search API Call
-// Query 1
-flickr.photos.search({
-    text: animal_tag,
-    min_upload_date: '2020-01-01', // YYYY-MM-DD
-    max_upload_date: '2020-02-01'
-}).then(function (res) {
-    console.log('Successful API Call', res.body);
-}).catch(function (err) {
-    console.error('Something Went Wrong', err);
-});
-
 // Query 2
-flickr.photos.search({
-    text: animal_tag,
-    min_upload_date: '2020-01-01',
-    max_upload_date: '2020-03-01'
-}).then(function (res) {
-    console.log('Successful API Call', res.body);
-}).catch(function (err) {
-    console.error('Something Went Wrong', err);
-});
+function query2() {
+    flickr.photos.search({
+        text: animal_tag,
+        min_upload_date: '2020-01-01',
+        max_upload_date: '2020-03-01'
+    }).then(function (res) {
+        console.log('Successful API Call 2', res.body);
+    }).catch(function (err) {
+        console.error('Something Went Wrong', err);
+    });
+}
 
 // Query 3
-flickr.photos.search({
-    text: animal_tag,
-    min_upload_date: '2020-01-01',
-    max_upload_date: '2020-04-01'
-}).then(function (res) {
-    console.log('Successful API Call', res.body);
-}).catch(function (err) {
-    console.error('Something Went Wrong', err);
-});
+function query3() {
+    flickr.photos.search({
+        text: animal_tag,
+        min_upload_date: '2020-01-01',
+        max_upload_date: '2020-04-01'
+    }).then(function (res) {
+        console.log('Successful API Call 3', res.body);
+    }).catch(function (err) {
+        console.error('Something Went Wrong', err);
+    });
+}
 
-console.log("Searching for: " + animal_tag)
+query1();
+setTimeout(query2, 1000);
+setTimeout(query3, 1000);
+
