@@ -55,14 +55,14 @@ const insertDocuments = function(db, callback) {
     });
 }
 
-// Flickr API
-// flickr.photos.getInfo({
-//     photo_id: 25825763 // sorry, @dokas
-// }).then(function (res) {
-//     console.log('yay!', res.body);
-// }).catch(function (err) {
-//     console.error('bonk', err);
-// });
+ //Flickr API
+ flickr.photos.getInfo({
+     photo_id: 25825763 // sorry, @dokas
+ }).then(function (res) {
+     console.log('yay!', res.body);
+ }).catch(function (err) {
+     console.error('bonk', err);
+ });
 
 
 
