@@ -10,6 +10,8 @@ Developing a Software Testing Tool with [Node.js](https://nodejs.org/en/), [Chan
 4. `node server.js`
 
 ### Requirements
-Flickr API Key: https://www.flickr.com/services/api/keys/apply/
+Node Package Manager (npm): https://www.npmjs.com/get-npm
 
 MongoDB Client: https://docs.mongodb.com/manual/installation/
+
+Flickr API Key: https://www.flickr.com/services/api/keys/apply/

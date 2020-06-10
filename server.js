@@ -17,7 +17,7 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const url = "mongodb://localhost:27017/";
 const dbName = 'csit314';
-const client = new MongoClient(url, {useNewUrlParser: true});
+const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Import Flickr API to conduct Tests
 /*
@@ -55,14 +55,40 @@ const insertDocuments = function(db, callback) {
     });
 }
 
-// Flickr API
-// flickr.photos.getInfo({
-//     photo_id: 25825763 // sorry, @dokas
-// }).then(function (res) {
-//     console.log('yay!', res.body);
-// }).catch(function (err) {
-//     console.error('bonk', err);
-// });
+var animal_tag = chance.animal().toString()
 
+// Flickr Photo Search API Call
+// Query 1
+flickr.photos.search({
+    text: animal_tag,
+    min_upload_date: '2020-01-01', // YYYY-MM-DD
+    max_upload_date: '2020-02-01'
+}).then(function (res) {
+    console.log('Successful API Call', res.body);
+}).catch(function (err) {
+    console.error('Something Went Wrong', err);
+});
 
+// Query 2
+flickr.photos.search({
+    text: animal_tag,
+    min_upload_date: '2020-01-01',
+    max_upload_date: '2020-03-01'
+}).then(function (res) {
+    console.log('Successful API Call', res.body);
+}).catch(function (err) {
+    console.error('Something Went Wrong', err);
+});
 
+// Query 3
+flickr.photos.search({
+    text: animal_tag,
+    min_upload_date: '2020-01-01',
+    max_upload_date: '2020-04-01'
+}).then(function (res) {
+    console.log('Successful API Call', res.body);
+}).catch(function (err) {
+    console.error('Something Went Wrong', err);
+});
+
+console.log("Searching for: " + animal_tag)
