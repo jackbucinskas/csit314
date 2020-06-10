@@ -30,22 +30,20 @@ var Flickr = require('flickr-sdk');
 var flickr = new Flickr(process.env.FLICKR_API_KEY);
 
 // Connect to MongoDB
-client.connect(function(err) {
+client.connect(function (err) {
     assert.equal(null, err);
     console.log("Connected successfully to server");
 
     const db = client.db(dbName);
 
-    db.createCollection("query_results", function(err, res) {
+    db.createCollection("query_results", function (err) {
         if (err) throw err;
         console.log("Collection created!");
     });
 
-    const collection = db.collection('reports');
 
     // Flickr Photo Search API Call
-
-    //Queries - Section 1
+    // Queries - Section 1
     // Randomize search text and print "Searching for: Random Animal"
     var animal_tag = chance.animal().toString();
     console.log("Searching for: " + animal_tag);
@@ -55,7 +53,6 @@ client.connect(function(err) {
     function query1() {
         flickr.photos.search({
             text: animal_tag,
-            tags: 'technology',
             min_upload_date: '2020-01-01', // YYYY-MM-DD
             max_upload_date: '2020-02-01'
         }).then(function (res) {
@@ -67,8 +64,6 @@ client.connect(function(err) {
             console.error('Something Went Wrong', err);
         });
     }
-
-    tags: 'technology'
 
     // Query 1.2
     function query2() {
@@ -103,92 +98,75 @@ client.connect(function(err) {
     }
 
 
-    //Queries - Section 2
-    var random_id = chance.integer({ min: 0, max: 100});
-    //Query 2.1
+    // Queries - Section 2
+    var random_id = chance.integer({min: 0, max: 100});
+    // Query 2.1
     var posted_date, taken_date
 
     function query2_1() {
-      flickr.photos.getRecent({ //get most recent public posts
-        per_page: 100, //limit to 100 results per page
-        page: 1 //search on page 1
-      }).then(function (res) {
-        console.log("Successful API Call 2.1", res.body);
-        var photo_id = res.body.photos.photo[random_id].id; //use random integer initilised above for id index
-        
-        flickr.photos.getInfo({ //get info on particular post
-          photo_id: photo_id
+        flickr.photos.getRecent({ //get most recent public posts
+            per_page: 100, //limit to 100 results per page
+            page: 1 //search on page 1
         }).then(function (res) {
-          posted_date = res.body.photo.dates.posted;
-          var myDate = new Date(res.body.photo.dates.taken);
-          taken_date = myDate.getTime()/1000.0; //convert date
-          console.log('Saving to ' + url + dbName + '\n');
-          db.collection("query_results").insertOne(res.body); //save results to database
+            console.log("Successful API Call 2.1", res.body);
+            var photo_id = res.body.photos.photo[random_id].id; //use random integer initilised above for id index
+
+            flickr.photos.getInfo({ //get info on particular post
+                photo_id: photo_id
+            }).then(function (res) {
+                posted_date = res.body.photo.dates.posted;
+                var myDate = new Date(res.body.photo.dates.taken);
+                taken_date = myDate.getTime() / 1000.0; //convert date
+                console.log('Saving to ' + url + dbName + '\n');
+                db.collection("query_results").insertOne(res.body); //save results to database
+            }).catch(function (err) {
+                console.error('Something Went Wrong', err);
+            });
+
         }).catch(function (err) {
-          console.error('Something Went Wrong', err);
+            console.error('Something Went Wrong', err);
         });
-        
-      }).catch(function (err) {
-        console.error('Something Went Wrong', err);
-      });
     }
 
-    //Test function
+    // Test function
     function testQueries1(totalsArray) {
-      var pass; 
-      console.log("--- Tests ---\n");
+        var pass;
+        console.log("--- Tests ---\n");
 
-      console.log("-Section 1 Queries-");
-      console.log("-Test 1-");
-      console.log("Is (Query 1 total < Query 2 total < Query 3 total) true?")
-      console.log("Query 1 total =", totalsArray[0]);
-      console.log("Query 2 total =", totalsArray[1]);
-      console.log("Query 3 total =", totalsArray[2]);
+        console.log("-Section 1 Queries-");
+        console.log("-Test 1-");
+        console.log("Is (Query 1 total < Query 2 total < Query 3 total) true?")
+        console.log("Query 1 total =", totalsArray[0]);
+        console.log("Query 2 total =", totalsArray[1]);
+        console.log("Query 3 total =", totalsArray[2]);
 
-      if (totalsArray[0] < totalsArray[1] < totalsArray[2]){
-        pass = true;
-      }
-      else{
-        pass = false;
-      };
-
-      console.log("Section 1 - Test 1 pass:", pass);
+        pass = totalsArray[0] < totalsArray[1] < totalsArray[2];
+        console.log("Section 1 - Test 1 pass:", pass);
 
 
-      console.log("\n\n-Test 2-");
-      console.log("Is (Query 1 total < Query 3 total) true?")
-      console.log("Query 1 total =", totalsArray[0]);
-      console.log("Query 3 total =", totalsArray[2]);
+        console.log("\n\n-Test 2-");
+        console.log("Is (Query 1 total < Query 3 total) true?")
+        console.log("Query 1 total =", totalsArray[0]);
+        console.log("Query 3 total =", totalsArray[2]);
 
-      if (totalsArray[0] < totalsArray[2]){
-        pass = true;
-      }
-      else{
-        pass = false;
-      };
-
-      console.log("Section 1 - Test 2 pass:", pass);
+        pass = totalsArray[0] < totalsArray[2];
+        console.log("Section 1 - Test 2 pass:", pass);
 
 
-      console.log("\n\n-Section 2 Queries-");
-      console.log("-Test 1-");
-      console.log("Is date posted later than date taken?")
+        console.log("\n\n-Section 2 Queries-");
+        console.log("-Test 1-");
+        console.log("Is date taken before date posted?")
 
-      var postedDate = new Date( posted_date *1000);
-      var takenDate = new Date( taken_date *1000);
+        var postedDate = new Date(posted_date * 1000);
+        var takenDate = new Date(taken_date * 1000);
 
-      console.log("Date posted:", postedDate.toGMTString());
-      console.log("Date taken:", takenDate.toGMTString());
+        console.log("Date taken:", takenDate.toGMTString());
+        console.log("Date posted:", postedDate.toGMTString());
 
-      if (posted_date > taken_date){
-        pass = true;
-      } else {
-        pass = false;
-      };
+        pass = posted_date > taken_date;
+        console.log("Section 2 pass:", pass);
 
-      console.log("Section 2 pass:", pass);
-
-      process.exit();
+        process.exit();
     }
 
     // Conduct Flickr Search API Call
@@ -196,10 +174,10 @@ client.connect(function(err) {
     setTimeout(query2, 1000);
     setTimeout(query3, 2000);
 
+    // Run Query 2
     setTimeout(query2_1, 3000);
 
     //Run test
     setTimeout(testQueries1, 5000, totals);
-
 
 });
