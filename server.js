@@ -13,12 +13,12 @@ require('dotenv').config();
 var chance = require('chance').Chance();
 
 // Import MongoDB for logging results
-const MongoClient = require('mongodb').MongoClient;
+//const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-const url = "mongodb://localhost:27017/";
+//const url = "mongodb://localhost:27017/";
 const dbName = 'csit314';
 //const client = new MongoClient(url, {useNewUrlParser: true});
-const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
+//const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Import Flickr API to conduct Tests
 /*
@@ -144,12 +144,27 @@ function verifyRequestToken(req, res, query) {
 		));
 
 		// make an API call on behalf of the user
-		flickr.test.login().pipe(res);
+    flickr.test.login().pipe(res);
+    
+    var upload = new Flickr.Upload(auth, __dirname + '/upload.png', {
+      title: 'Works on MY machine!'
+    });
+    
+    // this is a request instance, so we can just call .then()
+    // to kick off the request.
+    
+    upload.then(function (res) {
+      console.log('res', res.body);
+    }).catch(function (err) {
+      console.log('err', err);
+    });
 
 	}).catch(function (err) {
 		res.statusCode = 400;
 		res.end(err.message);
-	});
+  });
+  
+
 }
 
 
@@ -164,9 +179,10 @@ http.createServer(function (req, res) {
 	default:
 		res.statusCode = 404;
 		res.end();
-	}
+  }
+  
+
 }).listen(3000, function () {
 	console.log('Open your browser to http://localhost:3000');
 });
-
 
