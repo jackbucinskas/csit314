@@ -83,6 +83,7 @@ var oauth = new Flickr.OAuth(
 
 var oauthToken, tokenSecret, oauthVerifier
 
+
 oauth.request('http://localhost:27017/oauth/callback').then(function (res) {
   console.log('Nice Success!');
   console.log('oauth token:', res.body.oauth_token);
@@ -91,19 +92,40 @@ oauth.request('http://localhost:27017/oauth/callback').then(function (res) {
   tokenSecret = res.body.oauth_token_secret;
   console.log('oauth verifier:', res.body.oauth_callback_confirmed);
   oauthVerifier = res.body.oauth_callback_confirmed;
+
+  var flickr2 = new Flickr(Flickr.OAuth.createPlugin(
+    process.env.FLICKR_CONSUMER_KEY,
+    process.env.FLICKR_CONSUMER_SECRET,
+    res.body.oauth_token,
+    res.body.oauth_token_secret
+    
+  ));
+
+  var url2 = oauth.authorizeUrl(oauthToken); // "https://www.flickr.com/services/oauth..."
+
+  console.log('location', url2);
+  
+  flickr2.test.login().then(function (res) {
+    console.log('yay!', res.body);
+  }).catch(function (err) {
+    console.error('bonk', err);
+  });
+  
+
 }).catch(function (err) {
   console.error('Big oof!', err);
 });
 
-console.log('auth var =', oauthToken);
+//console.log('auth var =', oauthToken);
 
-/*
-var url2 = oauth.authorizeUrl(requestToken); // "https://www.flickr.com/services/oauth..."
- 
-res.setHeader("Location", url2);
-res.statusCode = 302;
-res.end();
-*/
+
+//var url2 = oauth.authorizeUrl(oauthToken); // "https://www.flickr.com/services/oauth..."
+
+//console.log('location', url2);
+//res.setHeader("Location", url2);
+//res.statusCode = 302;
+//res.end();
+
 
 /*
   flickr.test.login().then(function (res) {
