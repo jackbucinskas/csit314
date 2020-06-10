@@ -81,13 +81,21 @@ var oauth = new Flickr.OAuth(
   process.env.FLICKR_CONSUMER_SECRET
 );
 
+var oauthToken, tokenSecret, oauthVerifier
+
 oauth.request('http://localhost:27017/oauth/callback').then(function (res) {
-  console.log('yay!', res);
+  console.log('Nice Success!');
+  console.log('oauth token:', res.body.oauth_token);
+  oauthToken = res.body.oauth_token;
+  console.log('oauth token secret:', res.body.oauth_token_secret);
+  tokenSecret = res.body.oauth_token_secret;
+  console.log('oauth verifier:', res.body.oauth_callback_confirmed);
+  oauthVerifier = res.body.oauth_callback_confirmed;
 }).catch(function (err) {
-  console.error('bonk', err);
+  console.error('Big oof!', err);
 });
 
-
+console.log('auth var =', oauthToken);
 
 /*
 var url2 = oauth.authorizeUrl(requestToken); // "https://www.flickr.com/services/oauth..."
@@ -105,11 +113,13 @@ res.end();
   });
 */
 /*
-  oauth.verify(oauthToken, oauthVerifier, tokenSecret).then(function (res) {
-    console.log('oauth token:', res.body.oauth_token);
-    console.log('oauth token secret:', res.body.oauth_token_secret);
-  }).catch(function (err) {
-   console.log('bonk', err);
-  });
+oauth.verify(oauthToken, oauthVerifier, tokenSecret).then(function (res) {
+  console.log('oauth token:', res.body.oauth_token);
+  console.log('oauth token secret:', res.body.oauth_token_secret);
+}).catch(function (err) {
+  console.log('bonk', err);
+});
 */
+
+//oauth_callback_confirmed=true&oauth_token=72157714646442871-276e7683c7651033&oauth_token_secret=f044ad1c18cab8c3
 
